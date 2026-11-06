@@ -1,1 +1,211 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fishing Assistant</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #101b20;
+      color: #f4f7f5;
+    }
+
+    header {
+      padding: 24px 7%;
+      border-bottom: 1px solid #293a3d;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: bold;
+      color: #8bc9a4;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 65px 20px 35px;
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 6vw, 52px);
+      margin-bottom: 15px;
+    }
+
+    .hero p {
+      color: #aabbb5;
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 650px;
+      margin: 20px auto 70px;
+      padding: 30px;
+      background: #1b292d;
+      border: 1px solid #344649;
+      border-radius: 16px;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      margin: 20px 0 8px;
+      color: #d5e3dc;
+      font-weight: bold;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid #40575a;
+      background: #101b20;
+      color: white;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 28px;
+      padding: 16px;
+      background: #65aa80;
+      color: #102019;
+      border: none;
+      border-radius: 8px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #82c398;
+    }
+
+    #message {
+      margin-top: 20px;
+      color: #a9d9b7;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #82948d;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">🎣 Fishing Assistant</div>
+    <div>Find the fish.</div>
+  </header>
+
+  <section class="hero">
+    <h1>Fish Smarter.</h1>
+    <p>
+      Tell us about your fishing conditions.
+      We'll help you figure out what to throw.
+    </p>
+  </section>
+
+  <main class="container">
+    <h2>Fishing Conditions</h2>
+    <p>Start by telling us where and what you're fishing for.</p>
+
+    <form id="fishingForm">
+
+      <label for="species">What are you fishing for?</label>
+      <select id="species" required>
+        <option value="">Select a species</option>
+        <option value="Largemouth Bass">Largemouth Bass</option>
+        <option value="Smallmouth Bass">Smallmouth Bass</option>
+        <option value="Trout">Trout</option>
+        <option value="Catfish">Catfish</option>
+        <option value="Crappie">Crappie</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label for="water">Type of water</label>
+      <select id="water" required>
+        <option value="">Select water type</option>
+        <option value="Lake">Lake</option>
+        <option value="Pond">Pond</option>
+        <option value="River">River</option>
+        <option value="Stream">Stream</option>
+        <option value="Saltwater">Saltwater</option>
+        <option value="Brackish Water">Brackish Water</option>
+      </select>
+
+      <label for="temperature">Water temperature (°F)</label>
+      <input
+        type="number"
+        id="temperature"
+        min="32"
+        max="100"
+        placeholder="Example: 68"
+      >
+
+      <label for="clarity">Water clarity</label>
+      <select id="clarity" required>
+        <option value="">Select water clarity</option>
+        <option value="Clear">Clear</option>
+        <option value="Slightly stained">Slightly stained</option>
+        <option value="Stained">Stained</option>
+        <option value="Muddy">Muddy</option>
+      </select>
+
+      <label for="weather">Current weather</label>
+      <select id="weather" required>
+        <option value="">Select weather</option>
+        <option value="Sunny">Sunny</option>
+        <option value="Partly cloudy">Partly cloudy</option>
+        <option value="Cloudy">Cloudy</option>
+        <option value="Rainy">Rainy</option>
+      </select>
+
+      <button type="submit">Analyze Fishing Conditions</button>
+
+    </form>
+
+    <div id="message"></div>
+  </main>
+
+  <footer>
+    Fishing Assistant | Built for anglers
+  </footer>
+
+  <script>
+    const form = document.getElementById("fishingForm");
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const species = document.getElementById("species").value;
+      const water = document.getElementById("water").value;
+
+      document.getElementById("message").textContent =
+        "Great! We're preparing to analyze conditions for " +
+        species + " in a " + water + ".";
+    });
+  </script>
+
+</body>
+</html>
