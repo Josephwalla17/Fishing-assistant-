@@ -317,336 +317,399 @@ form.addEventListener("submit", function(event) {
   // 2. CREATE THE LURE DATABASE
   // ==========================================
 
-  const lures = [
-    {
-      name: "Spinnerbait",
-      color: "White, chartreuse, or natural shad",
-      size: "3/8 oz starting point",
-      depth: "Match the retrieve to the depth of the cover",
-      technique: "Cast past the target and retrieve steadily. Try varying speed.",
-      score: 50,
-      reasons: []
-    },
-    {
-      name: "Chatterbait",
-      color: "Green pumpkin, white, or bluegill",
-      size: "3/8 oz starting point",
-      depth: "Shallow to medium, depending on model",
-      technique: "Retrieve steadily through or alongside vegetation.",
-      score: 50,
-      reasons: []
-    },
-    {
-      name: "Texas-Rigged Worm",
-      color: "Green pumpkin, watermelon, or black and blue",
-      size: "6-inch worm starting point",
-      depth: "Bottom and around cover",
-      technique: "Let it sink, then drag slowly and pause.",
-      score: 50,
-      reasons: []
-    },
-    {
-      name: "Bass Jig",
-      color: "Green pumpkin, brown, or black and blue",
-      size: "3/8 oz starting point",
-      depth: "Bottom and around structure",
-      technique: "Work slowly around wood, rocks, and vegetation.",
-      score: 50,
-      reasons: []
-    },
-    {
-      name: "Squarebill Crankbait",
-      color: "Shad, crawfish, or bluegill",
-      size: "Medium-sized shallow-running model",
-      depth: "Use a model that reaches the target depth",
-      technique: "Retrieve around shallow rocks and wood.",
-      score: 50,
-      reasons: []
-    },
-    {
-      name: "Lipless Crankbait",
-      color: "Shad, crawfish, or bluegill",
-      size: "1/2 oz starting point",
-      depth: "Variable; count down to the target depth",
-      technique: "Try a steady retrieve or a lift-and-fall presentation.",
-      score: 50,
-      reasons: []
-    },
-    {
-      name: "Suspending Jerkbait",
-      color: "Natural shad or bluegill",
-      size: "3–4 inch starting point",
-      depth: "Middle of the water column",
-      technique: "Use short movements followed by pauses.",
-      score: 50,
-      reasons: []
-    },
-    {
-      name: "Topwater Walking Bait",
-      color: "Shad or natural baitfish",
-      size: "3–4 inch starting point",
-      depth: "Surface",
-      technique: "Walk the bait across the surface with short rod movements.",
-      score: 50,
-      reasons: []
-    },
-    {
-      name: "Swimbait",
-      color: "Match the local baitfish",
-      size: "3–4 inch starting point",
-      depth: "Adjust to where baitfish and bass are located",
-      technique: "Use a steady retrieve at the target depth.",
-      score: 50,
-      reasons: []
-    },
-    {
-      name: "Ned Rig",
-      color: "Green pumpkin or natural colors",
-      size: "2.5–3 inch starting point",
-      depth: "Near the bottom",
-      technique: "Use a slow drag with occasional pauses.",
-      score: 50,
-      reasons: []
-    }
-  ];
+ 
+// ================================================
+// NEW RECOMMENDATION ENGINE
+// Uses the 22 techniques in LureDatabase.js
+// ================================================
 
-  // ==========================================
-  // 3. SCORING FUNCTION
-  // ==========================================
+// Only support largemouth bass in this version.
+if (species !== "Largemouth Bass") {
+  result.style.display = "block";
+  result.textContent =
+    "This version currently supports largemouth bass only. Support for other species will be added later.";
+  result.scrollIntoView({ behavior: "smooth", block: "start" });
+  return;
+}
 
-  function points(name, amount, reason) {
-    const lure = lures.find(item => item.name === name);
+// Make sure the database loaded correctly.
+if (!Array.isArray(window.lureDatabase)) {
+  result.style.display = "block";
+  result.textContent =
+    "The lure database could not be loaded. Please refresh the page and try again.";
+  return;
+}
 
-    if (!lure) return;
+// Start every technique with a neutral score.
+const lures = window.lureDatabase.map(item => ({
+  id: item.id,
+  name: item.name,
+  score: 0,
+  reasons: [],
+  color: item.colorGuidance,
+  size: "Choose a size and weight appropriate for the local forage, depth, and tackle.",
+  depth: item.depthGuidance,
+  technique: item.presentation,
+  confidence: item.confidence
+}));
 
-    lure.score += amount;
+// Add points and explanations to a technique.
+function addPoints(id, points, reason) {
+  const lure = lures.find(item => item.id === id);
+  if (!lure) return;
 
-    if (reason && amount > 0) {
-      lure.reasons.push(reason);
-    }
+  lure.score += points;
+
+  if (reason && !lure.reasons.includes(reason)) {
+    lure.reasons.push(reason);
   }
+}
 
-  // ==========================================
-  // 4. WATER TEMPERATURE
-  // ==========================================
+// Add the same condition to several techniques.
+function addMany(ids, points, reason) {
+  ids.forEach(id => addPoints(id, points, reason));
+}
 
-  if (temp !== null) {
-    if (temp < 50) {
-      points("Suspending Jerkbait", 10, "A suspending presentation with pauses is worth testing in cold water.");
-      points("Ned Rig", 8, "A slower bottom presentation is another option.");
-      points("Lipless Crankbait", 4, "Can be worked with a slower lift-and-fall retrieve.");
-      points("Topwater Walking Bait", -8);
-    } else if (temp < 60) {
-      points("Suspending Jerkbait", 8, "Pauses can be useful when bass are less willing to chase.");
-      points("Lipless Crankbait", 6);
-      points("Ned Rig", 5);
-    } else if (temp < 75) {
-      points("Spinnerbait", 3);
-      points("Chatterbait", 3);
-      points("Squarebill Crankbait", 3);
-      points("Swimbait", 3);
-    } else {
-      points("Texas-Rigged Worm", 5, "A bottom presentation is worth testing in warm water.");
-      points("Bass Jig", 5);
-    }
+// -----------------------------------------------
+// 1. WATER CLARITY
+// -----------------------------------------------
+
+if (clarity.includes("clear")) {
+  addMany(
+    ["jerkbait", "wacky_rig", "drop_shot", "ned_rig", "neko_rig", "shaky_head"],
+    2,
+    "Clear water makes a more natural or subtle presentation worth considering."
+  );
+}
+
+if (clarity.includes("slightly stained")) {
+  addMany(
+    ["spinnerbait", "squarebill", "swimbait", "texas_rig", "wacky_rig"],
+    1,
+    "These presentations offer different ways to search or target cover in slightly stained water."
+  );
+}
+
+if (clarity.includes("stained")) {
+  addMany(
+    ["spinnerbait", "chatterbait", "squarebill", "lipless_crankbait"],
+    2,
+    "Flash, vibration, or movement may help bass locate these moving baits."
+  );
+
+  addMany(
+    ["texas_rig", "flipping_jig", "casting_jig"],
+    1,
+    "These can target bass holding near cover in stained water."
+  );
+}
+
+if (clarity.includes("muddy")) {
+  addMany(
+    ["spinnerbait", "chatterbait", "lipless_crankbait"],
+    2,
+    "Vibration and movement may help bass detect a moving bait in muddy water."
+  );
+
+  addMany(
+    ["flipping_jig", "texas_rig"],
+    1,
+    "A controlled presentation near identifiable cover is another option."
+  );
+}
+
+// -----------------------------------------------
+// 2. STRUCTURE AND COVER
+// -----------------------------------------------
+
+if (structure === "Grass") {
+  addMany(
+    ["chatterbait", "swim_jig", "lipless_crankbait", "spinnerbait"],
+    3,
+    "This lure can be worked around vegetation or its edges."
+  );
+
+  addMany(
+    ["texas_rig", "weightless_texas", "flipping_jig"],
+    2,
+    "A weedless or cover-oriented presentation can help fish vegetation."
+  );
+}
+
+if (structure === "Wood") {
+  addMany(
+    ["texas_rig", "flipping_jig", "casting_jig", "squarebill"],
+    3,
+    "This presentation is suitable for targeting bass around wood cover."
+  );
+
+  addMany(
+    ["weightless_texas", "wacky_rig"],
+    1,
+    "A slower presentation may be useful around individual wood targets."
+  );
+}
+
+if (structure === "Rocks") {
+  addMany(
+    ["football_jig", "squarebill", "shallow_crankbait", "deep_crankbait"],
+    3,
+    "This lure can be used to search or contact rocky structure."
+  );
+
+  addMany(
+    ["ned_rig", "shaky_head", "carolina_rig"],
+    2,
+    "A bottom-oriented presentation is worth considering around rock."
+  );
+}
+
+if (structure === "Docks") {
+  addMany(
+    ["wacky_rig", "texas_rig", "flipping_jig", "neko_rig"],
+    3,
+    "This presentation can target specific areas around docks."
+  );
+
+  addMany(
+    ["shaky_head", "finesse_jig"],
+    2,
+    "A slower presentation is another option for fishing dock targets."
+  );
+}
+
+if (structure === "Open water") {
+  addMany(
+    ["jerkbait", "soft_swimbait", "lipless_crankbait", "drop_shot"],
+    2,
+    "This presentation can be used away from dense shoreline cover."
+  );
+}
+
+if (structure === "Mixed") {
+  addMany(
+    ["spinnerbait", "texas_rig", "casting_jig", "soft_swimbait"],
+    1,
+    "This is a flexible option when several types of cover are present."
+  );
+}
+
+// -----------------------------------------------
+// 3. WATER DEPTH
+// -----------------------------------------------
+
+if (depth === "Shallow") {
+  addMany(
+    [
+      "topwater_walking",
+      "squarebill",
+      "shallow_crankbait",
+      "weightless_texas",
+      "wacky_rig",
+      "swim_jig",
+      "chatterbait"
+    ],
+    3,
+    "This presentation can target shallow water."
+  );
+
+  addPoints(
+    "spinnerbait",
+    2,
+    "A spinnerbait can be retrieved through shallow water."
+  );
+}
+
+if (depth === "Medium") {
+  addMany(
+    [
+      "jerkbait",
+      "lipless_crankbait",
+      "soft_swimbait",
+      "texas_rig",
+      "drop_shot",
+      "shaky_head"
+    ],
+    2,
+    "This technique can be adjusted to fish medium depths."
+  );
+}
+
+if (depth === "Deep") {
+  addMany(
+    [
+      "deep_crankbait",
+      "drop_shot",
+      "carolina_rig",
+      "football_jig",
+      "ned_rig"
+    ],
+    3,
+    "This technique can be used to reach or target deeper bass."
+  );
+
+  addMany(
+    ["shaky_head", "texas_rig"],
+    2,
+    "These rigs can be adjusted to fish deeper water."
+  );
+}
+
+// -----------------------------------------------
+// 4. FORAGE
+// -----------------------------------------------
+
+if (forage === "Shad") {
+  addMany(
+    [
+      "spinnerbait",
+      "chatterbait",
+      "jerkbait",
+      "lipless_crankbait",
+      "soft_swimbait",
+      "topwater_walking"
+    ],
+    3,
+    "This lure can imitate or resemble a shad or other baitfish."
+  );
+}
+
+if (forage === "Bluegill") {
+  addMany(
+    ["swim_jig", "flipping_jig", "casting_jig", "spinnerbait", "soft_swimbait"],
+    2,
+    "This lure can provide a profile or presentation suitable for targeting bass feeding on bluegill."
+  );
+}
+
+if (forage === "Crawfish") {
+  addMany(
+    ["football_jig", "finesse_jig", "squarebill", "texas_rig", "ned_rig"],
+    3,
+    "This lure or presentation can imitate crawfish or other bottom-oriented prey."
+  );
+}
+
+// -----------------------------------------------
+// 5. WEATHER AND LIGHT
+// -----------------------------------------------
+
+if (weather.includes("cloudy") || weather.includes("rainy")) {
+  addMany(
+    ["spinnerbait", "chatterbait", "squarebill"],
+    1,
+    "Moving baits are worth considering under these conditions, depending on fish activity."
+  );
+}
+
+if (weather.includes("sunny")) {
+  if (structure === "Docks" || structure === "Wood") {
+    addMany(
+      ["texas_rig", "wacky_rig", "flipping_jig"],
+      2,
+      "A slower presentation can target shaded areas around cover."
+    );
   }
+}
 
-  // ==========================================
-  // 5. WATER CLARITY
-  // ==========================================
+// -----------------------------------------------
+// 6. TIME OF DAY
+// -----------------------------------------------
 
-  if (clarity.includes("clear")) {
-    points("Suspending Jerkbait", 7, "Natural-looking colors can be useful in clear water.");
-    points("Swimbait", 7, "A natural baitfish presentation is a good clear-water option.");
-    points("Ned Rig", 6, "A subtle presentation is worth trying.");
-    points("Spinnerbait", -2);
-  } else if (clarity.includes("muddy")) {
-    points("Spinnerbait", 9, "Flash and vibration can help fish locate a moving bait.");
-    points("Chatterbait", 7);
-    points("Bass Jig", 5);
-    points("Texas-Rigged Worm", 3);
-    points("Swimbait", -3);
-  } else if (clarity.includes("stain")) {
-    points("Spinnerbait", 7, "A moving bait with flash can be useful in stained water.");
-    points("Chatterbait", 6);
-    points("Squarebill Crankbait", 4);
+if (time.includes("early morning") || time === "morning" || time === "evening") {
+  addMany(
+    ["topwater_walking", "spinnerbait"],
+    1,
+    "Surface or moving presentations may be worth testing during lower-light periods."
+  );
+}
+
+if (time === "midday" || time === "afternoon") {
+  if (structure === "Docks" || structure === "Wood" || structure === "Grass") {
+    addMany(
+      ["texas_rig", "wacky_rig", "flipping_jig"],
+      2,
+      "These presentations can target specific cover during the middle of the day."
+    );
   }
+}
 
-  // ==========================================
-  // 6. WEATHER AND LIGHT
-  // ==========================================
+if (time === "night") {
+  addMany(
+    ["texas_rig", "spinnerbait", "flipping_jig"],
+    1,
+    "These presentations are options for targeting bass around cover at night."
+  );
+}
 
-  if (weather.includes("cloud") || weather.includes("overcast")) {
-    points("Spinnerbait", 5, "Cloud cover can create opportunities for moving baits.");
-    points("Chatterbait", 4);
-    points("Topwater Walking Bait", 3);
+// -----------------------------------------------
+// 7. WIND
+// -----------------------------------------------
+
+if (wind !== null && wind >= 10) {
+  addMany(
+    ["spinnerbait", "chatterbait", "lipless_crankbait"],
+    2,
+    "Wind can create opportunities for moving baits, especially around wind-affected areas."
+  );
+} else if (wind !== null && wind >= 5) {
+  addMany(
+    ["spinnerbait", "chatterbait"],
+    1,
+    "Some wind may make a moving presentation worth testing."
+  );
+}
+
+// Wind direction is intentionally not scored.
+// Direction alone does not tell us which bank is windblown.
+
+// -----------------------------------------------
+// 8. WATER TEMPERATURE
+// -----------------------------------------------
+
+// These are broad, cautious tendencies, not fixed
+// temperature rules. Bass behavior varies by location,
+// season, weather history, and other conditions.
+
+if (temp !== null && temp <= 55) {
+  addMany(
+    ["jerkbait", "lipless_crankbait", "football_jig", "ned_rig"],
+    1,
+    "These presentations are worth considering in cooler water, but fish activity and location still matter."
+  );
+}
+
+if (temp !== null && temp >= 75) {
+  addMany(
+    ["drop_shot", "texas_rig", "football_jig", "deep_crankbait"],
+    1,
+    "These techniques can help target bass near deeper structure or cover when fish are holding there."
+  );
+}
+
+// -----------------------------------------------
+// 9. REMOVE UNSUPPORTED TECHNIQUES AND RANK
+// -----------------------------------------------
+
+// Give every technique a small neutral starting score.
+// This prevents a technique from disappearing simply
+// because the angler did not know an answer.
+
+lures.forEach(lure => {
+  lure.score += 1;
+
+  if (lure.reasons.length === 0) {
+    lure.reasons.push(
+      "This is a general option. The conditions entered did not strongly favor it."
+    );
   }
+});
 
-  if (weather.includes("rain")) {
-    points("Spinnerbait", 4, "A moving bait can be worth trying during suitable rainy conditions.");
-    points("Chatterbait", 3);
-  }
+// Rank the techniques by their experimental match points.
+lures.sort((a, b) => b.score - a.score);
 
-  if (weather.includes("sun")) {
-    points("Texas-Rigged Worm", 3, "A bottom presentation can be useful around shaded cover.");
-    points("Bass Jig", 3);
-  }
-
-  if (time.includes("morning") || time.includes("evening")) {
-    points("Topwater Walking Bait", 7, "Low-light periods can create surface-feeding opportunities.");
-    points("Spinnerbait", 2);
-  }
-
-  if (time.includes("midday") || time.includes("afternoon")) {
-    points("Texas-Rigged Worm", 3);
-    points("Bass Jig", 3);
-  }
-
-  if (time.includes("night")) {
-    points("Bass Jig", 6, "A slow bottom presentation is worth trying at night.");
-    points("Texas-Rigged Worm", 6);
-    points("Spinnerbait", 2);
-  }
-
-  // ==========================================
-  // 7. WIND
-  // ==========================================
-
-  if (wind !== null) {
-    if (wind >= 10) {
-      points("Spinnerbait", 8, "Wind can make moving baits useful around wind-affected areas.");
-      points("Chatterbait", 6);
-      points("Lipless Crankbait", 4);
-    } else if (wind >= 5) {
-      points("Spinnerbait", 4);
-      points("Chatterbait", 3);
-    } else if (wind <= 2) {
-      points("Ned Rig", 3, "Calm conditions can make a subtle presentation worth testing.");
-      points("Texas-Rigged Worm", 3);
-    }
-  }
-
-  // ==========================================
-  // 8. SEASON
-  // ==========================================
-
-  if (season === "spring") {
-    points("Spinnerbait", 3);
-    points("Texas-Rigged Worm", 3);
-    points("Bass Jig", 3);
-  } else if (season === "summer") {
-    points("Texas-Rigged Worm", 5, "Targeting cover and deeper edges can be productive in summer.");
-    points("Bass Jig", 4);
-    points("Topwater Walking Bait", 3);
-  } else if (season === "fall") {
-    points("Lipless Crankbait", 5, "A baitfish-style moving presentation is worth testing.");
-    points("Spinnerbait", 4);
-    points("Swimbait", 4);
-  } else if (season === "winter") {
-    points("Suspending Jerkbait", 5);
-    points("Ned Rig", 4);
-    points("Lipless Crankbait", 3);
-  }
-
-  // ==========================================
-  // 9. STRUCTURE AND COVER
-  // ==========================================
-
-  if (structure.includes("grass")) {
-    points("Chatterbait", 10, "Designed to be fished around and through suitable vegetation.");
-    points("Spinnerbait", 7);
-    points("Lipless Crankbait", 6);
-    points("Texas-Rigged Worm", 5);
-  } else if (structure.includes("wood")) {
-    points("Texas-Rigged Worm", 10, "A weedless worm can be worked around submerged wood.");
-    points("Bass Jig", 10, "A jig is useful around wood and brush.");
-    points("Squarebill Crankbait", 4);
-    points("Spinnerbait", 3);
-  } else if (structure.includes("rock")) {
-    points("Bass Jig", 9, "A jig can be worked along rocky structure.");
-    points("Squarebill Crankbait", 7);
-    points("Ned Rig", 6);
-    points("Lipless Crankbait", 3);
-  } else if (structure.includes("dock")) {
-    points("Texas-Rigged Worm", 9, "A worm can be pitched around dock posts and shade.");
-    points("Bass Jig", 9);
-    points("Swimbait", 3);
-  } else if (structure.includes("open")) {
-    points("Swimbait", 8, "A swimbait can imitate baitfish in open water.");
-    points("Suspending Jerkbait", 5);
-    points("Lipless Crankbait", 4);
-  } else if (structure.includes("mixed")) {
-    points("Spinnerbait", 3);
-    points("Texas-Rigged Worm", 3);
-    points("Bass Jig", 3);
-  }
-
-  // ==========================================
-  // 10. WATER DEPTH
-  // ==========================================
-
-  if (depth.includes("shallow")) {
-    points("Squarebill Crankbait", 6, "A shallow-running crankbait can target shallow cover.");
-    points("Spinnerbait", 5);
-    points("Chatterbait", 4);
-    points("Topwater Walking Bait", 3);
-  } else if (depth.includes("medium")) {
-    points("Swimbait", 4);
-    points("Lipless Crankbait", 4);
-    points("Suspending Jerkbait", 3);
-  } else if (depth.includes("deep")) {
-    points("Ned Rig", 6, "A bottom presentation can target deeper areas.");
-    points("Bass Jig", 6);
-    points("Texas-Rigged Worm", 5);
-    points("Swimbait", 4);
-  }
-
-  // ==========================================
-  // 11. FORAGE
-  // ==========================================
-
-  if (forage.includes("shad")) {
-    points("Swimbait", 9, "Imitates the shad that bass are feeding on.");
-    points("Lipless Crankbait", 7);
-    points("Spinnerbait", 5);
-    points("Suspending Jerkbait", 4);
-  } else if (forage.includes("bluegill")) {
-    points("Chatterbait", 7, "A bluegill-style color can imitate available prey.");
-    points("Swimbait", 7);
-    points("Bass Jig", 5);
-    points("Spinnerbait", 4);
-  } else if (forage.includes("crawfish")) {
-    points("Bass Jig", 9, "A crawfish-colored jig can imitate crawfish.");
-    points("Texas-Rigged Worm", 5);
-    points("Squarebill Crankbait", 5);
-    points("Lipless Crankbait", 3);
-  } else if (forage.includes("other")) {
-    points("Swimbait", 2);
-  }
-
-  // ==========================================
-  // 12. ADJUST COLORS FOR CLARITY
-  // ==========================================
-
-  if (clarity.includes("muddy")) {
-    lures.forEach(lure => {
-      if (["Spinnerbait", "Chatterbait", "Bass Jig"].includes(lure.name)) {
-        lure.color = "Black and blue, chartreuse, or contrasting colors";
-      }
-    });
-  }
-
-  // ==========================================
-  // 13. RANK THE LURES
-  // ==========================================
-
-  lures.forEach(lure => {
-    lure.score = Math.max(0, Math.min(100, lure.score));
-  });
-
-  lures.sort((a, b) => b.score - a.score);
-
-  const topThree = lures.slice(0, 3);
+// Show the three highest-ranked techniques.
+const topThree = lures.slice(0, 3);
 
   // ==========================================
   // 14. DISPLAY RESULTS
