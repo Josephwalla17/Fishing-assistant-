@@ -1,110 +1,300 @@
 
-<script>
-  const form = document.getElementById("fishingForm");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  form.addEventListener("submit", function(event) {
-    event.preventDefault();
+  <title>Fishing Assistant</title>
 
-    const species = document.getElementById("species").value;
-    const water = document.getElementById("water").value;
-    const temperature = Number(
-      document.getElementById("temperature").value
-    );
-    const clarity = document.getElementById("clarity").value;
-    const weather = document.getElementById("weather").value;
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-    let lure = "";
-    let color = "";
-    let technique = "";
-    let depth = "";
-    let reason = "";
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #101b20;
+      color: #f4f7f5;
+    }
 
-    // BASS RECOMMENDATIONS
-    if (species.includes("Bass")) {
+    header {
+      padding: 24px 7%;
+      border-bottom: 1px solid #293a3d;
+    }
 
-      if (temperature && temperature < 55) {
-        lure = "Suspending jerkbait";
-        color = clarity === "Clear"
-          ? "Natural shad"
-          : "Chartreuse or white";
-        technique = "Fish slowly with pauses between movements.";
-        depth = "Try the middle of the water column.";
-        reason = "Cool water often makes bass less willing to chase fast-moving prey.";
+    .logo {
+      font-size: 22px;
+      font-weight: bold;
+      color: #8bc9a4;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 60px 20px 35px;
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 6vw, 52px);
+      margin-bottom: 15px;
+    }
+
+    .hero p {
+      color: #aabbb5;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 650px;
+      margin: 20px auto 70px;
+      padding: 30px;
+      background: #1b292d;
+      border: 1px solid #344649;
+      border-radius: 16px;
+    }
+
+    label {
+      display: block;
+      margin: 20px 0 8px;
+      font-weight: bold;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid #40575a;
+      background: #101b20;
+      color: white;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 28px;
+      padding: 16px;
+      background: #65aa80;
+      color: #102019;
+      border: none;
+      border-radius: 8px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #82c398;
+    }
+
+    #message {
+      display: none;
+      margin-top: 25px;
+      padding: 20px;
+      background: #263b35;
+      border: 1px solid #65aa80;
+      border-radius: 10px;
+      line-height: 1.8;
+      white-space: pre-line;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #82948d;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">🎣 Fishing Assistant</div>
+  </header>
+
+  <section class="hero">
+    <h1>Fish Smarter.</h1>
+    <p>
+      Tell us about your fishing conditions.
+      We'll help you figure out what to throw.
+    </p>
+  </section>
+
+  <main class="container">
+
+    <h2>Fishing Conditions</h2>
+    <p>Tell us where and what you're fishing for.</p>
+
+    <form id="fishingForm">
+
+      <label for="species">Target species</label>
+      <select id="species" required>
+        <option value="">Select a species</option>
+        <option value="Largemouth Bass">Largemouth Bass</option>
+        <option value="Smallmouth Bass">Smallmouth Bass</option>
+        <option value="Trout">Trout</option>
+        <option value="Catfish">Catfish</option>
+        <option value="Crappie">Crappie</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label for="water">Type of water</label>
+      <select id="water" required>
+        <option value="">Select water type</option>
+        <option value="Lake">Lake</option>
+        <option value="Pond">Pond</option>
+        <option value="River">River</option>
+        <option value="Stream">Stream</option>
+        <option value="Saltwater">Saltwater</option>
+        <option value="Brackish Water">Brackish Water</option>
+      </select>
+
+      <label for="temperature">Water temperature (°F)</label>
+      <input type="number" id="temperature"
+        min="32" max="100" placeholder="Example: 68">
+
+      <label for="clarity">Water clarity</label>
+      <select id="clarity" required>
+        <option value="">Select clarity</option>
+        <option value="Clear">Clear</option>
+        <option value="Slightly stained">Slightly stained</option>
+        <option value="Stained">Stained</option>
+        <option value="Muddy">Muddy</option>
+      </select>
+
+      <label for="weather">Weather</label>
+      <select id="weather" required>
+        <option value="">Select weather</option>
+        <option value="Sunny">Sunny</option>
+        <option value="Partly cloudy">Partly cloudy</option>
+        <option value="Cloudy">Cloudy</option>
+        <option value="Rainy">Rainy</option>
+      </select>
+
+      <button type="submit">Get Fishing Recommendations</button>
+
+    </form>
+
+    <div id="message"></div>
+
+  </main>
+
+  <footer>
+    Fishing Assistant | Built for anglers
+  </footer>
+
+  <script>
+
+    const form = document.getElementById("fishingForm");
+
+    form.addEventListener("submit", function(event) {
+
+      event.preventDefault();
+
+      const species = document.getElementById("species").value;
+      const water = document.getElementById("water").value;
+      const temperature = Number(
+        document.getElementById("temperature").value
+      );
+      const clarity = document.getElementById("clarity").value;
+      const weather = document.getElementById("weather").value;
+
+      let lure = "";
+      let color = "";
+      let technique = "";
+      let depth = "";
+      let reason = "";
+
+      if (species.includes("Bass")) {
+
+        if (temperature && temperature < 55) {
+          lure = "Suspending jerkbait";
+          color = clarity === "Clear"
+            ? "Natural shad"
+            : "Chartreuse or white";
+          technique = "Fish slowly with pauses between movements.";
+          depth = "Try the middle of the water column.";
+          reason = "Cool water often makes bass less willing to chase fast-moving prey.";
+        }
+
+        else if (clarity === "Muddy" || clarity === "Stained") {
+          lure = "Spinnerbait";
+          color = "White and chartreuse";
+          technique = "Use a steady retrieve around cover.";
+          depth = "Start around shallow cover.";
+          reason = "Vibration can help fish locate bait in reduced visibility.";
+        }
+
+        else if (weather === "Cloudy" || weather === "Rainy") {
+          lure = "Spinnerbait";
+          color = "White or white and chartreuse";
+          technique = "Use a steady retrieve around cover.";
+          depth = "Start in shallow to medium-depth water.";
+          reason = "Lower light can encourage bass to move around and feed.";
+        }
+
+        else {
+          lure = "Texas-rigged soft plastic worm";
+          color = clarity === "Clear"
+            ? "Green pumpkin"
+            : "Black and blue";
+          technique = "Fish slowly around vegetation, rocks, and cover.";
+          depth = "Start near the bottom.";
+          reason = "A soft plastic is a versatile option around bass cover.";
+        }
+
       }
 
-      else if (clarity === "Muddy" || clarity === "Stained") {
-        lure = "Spinnerbait";
-        color = "White and chartreuse";
-        technique = "Retrieve steadily, allowing the blades to create vibration.";
-        depth = "Start around shallow cover and nearby structure.";
-        reason = "Vibration and visible colors can help fish locate the bait in reduced visibility.";
+      else if (species === "Trout") {
+        lure = "Small inline spinner";
+        color = clarity === "Clear" ? "Silver" : "Gold";
+        technique = "Use a steady retrieve, adjusting for current.";
+        depth = "Try the upper and middle water column.";
+        reason = "Small spinners imitate moving prey and create flash.";
       }
 
-      else if (weather === "Cloudy" || weather === "Rainy") {
-        lure = "Spinnerbait";
-        color = "White or white and chartreuse";
-        technique = "Use a steady retrieve around cover.";
-        depth = "Start in shallow to medium-depth water.";
-        reason = "Lower light can encourage bass to move around and feed.";
+      else if (species === "Catfish") {
+        lure = "Natural bait on a bottom rig";
+        color = "Not applicable";
+        technique = "Present bait near the bottom.";
+        depth = "Near the bottom.";
+        reason = "Catfish commonly use smell and taste to locate food.";
+      }
+
+      else if (species === "Crappie") {
+        lure = "Small crappie jig";
+        color = clarity === "Clear" ? "White or silver" : "Chartreuse";
+        technique = "Use a slow retrieve around cover.";
+        depth = "Explore submerged cover at different depths.";
+        reason = "Small jigs imitate prey that crappie eat.";
       }
 
       else {
-        lure = "Texas-rigged soft plastic worm";
-        color = clarity === "Clear"
-          ? "Green pumpkin"
-          : "Black and blue";
-        technique = "Fish slowly around vegetation, rocks, and other cover.";
-        depth = "Start near the bottom.";
-        reason = "A natural-looking soft plastic is a versatile option around bass cover.";
+        lure = "Species-specific lure or natural bait";
+        color = "Match local forage and water clarity";
+        technique = "Use a presentation suited to your target species.";
+        depth = "Explore different depths.";
+        reason = "We need more species-specific information.";
       }
-    }
 
-    // TROUT RECOMMENDATIONS
-    else if (species === "Trout") {
-      lure = "Small inline spinner";
-      color = clarity === "Clear" ? "Silver" : "Gold";
-      technique = "Use a steady retrieve, adjusting speed to the current.";
-      depth = "Try the upper and middle portions of the water column.";
-      reason = "Small spinners imitate moving prey and create flash.";
-    }
+      const result = document.getElementById("message");
 
-    // CATFISH RECOMMENDATIONS
-    else if (species === "Catfish") {
-      lure = "Natural bait on a bottom rig";
-      color = "Not applicable";
-      technique = "Present bait near the bottom and allow time for fish to find it.";
-      depth = "Near the bottom.";
-      reason = "Catfish commonly use their sense of smell and taste to locate food.";
-    }
+      result.style.display = "block";
 
-    // CRAPPIE RECOMMENDATIONS
-    else if (species === "Crappie") {
-      lure = "Small crappie jig";
-      color = clarity === "Clear" ? "White or silver" : "Chartreuse";
-      technique = "Use a slow retrieve or gently jig around cover.";
-      depth = "Try around submerged cover and different depths.";
-      reason = "Small jigs imitate the baitfish and small prey crappie eat.";
-    }
+      result.textContent =
+        "YOUR FISHING RECOMMENDATION\n\n" +
+        "Target: " + species + "\n" +
+        "Water: " + water + "\n\n" +
+        "RECOMMENDED LURE\n" + lure + "\n\n" +
+        "COLOR\n" + color + "\n\n" +
+        "HOW TO FISH IT\n" + technique + "\n\n" +
+        "SUGGESTED DEPTH\n" + depth + "\n\n" +
+        "WHY WE RECOMMEND IT\n" + reason + "\n\n" +
+        "This is a starting suggestion, not a guarantee.";
 
-    // OTHER SPECIES
-    else {
-      lure = "Small natural bait or a species-specific lure";
-      color = "Match local forage and water clarity";
-      technique = "Start with a presentation appropriate for your target species.";
-      depth = "Explore different depths.";
-      reason = "We need more species-specific information to make a reliable recommendation.";
-    }
+    });
 
-    const result = document.getElementById("message");
+  </script>
 
-    result.textContent =
-      "YOUR FISHING RECOMMENDATION\n\n" +
-      "Target: " + species + "\n\n" +
-      "Recommended lure or bait: " + lure + "\n" +
-      "Color: " + color + "\n" +
-      "Technique: " + technique + "\n" +
-      "Suggested depth: " + depth + "\n\n" +
-      "WHY WE RECOMMEND IT\n" + reason +
-      "\n\nThis is a starting suggestion. Actual fish behavior depends on many conditions.";
-  });
-</script>
+</body>
+</html>
