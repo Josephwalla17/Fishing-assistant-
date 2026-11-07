@@ -138,15 +138,13 @@
         <option value="Other">Other</option>
       </select>
 
+     
       <label for="water">Type of water</label>
       <select id="water" required>
         <option value="">Select water type</option>
         <option value="Lake">Lake</option>
         <option value="Pond">Pond</option>
-        <option value="River">River</option>
-        <option value="Stream">Stream</option>
-        <option value="Saltwater">Saltwater</option>
-        <option value="Brackish Water">Brackish Water</option>
+        <option value="Reservoir">Reservoir</option>
       </select>
 
       <label for="temperature">Water temperature (°F)</label>
@@ -171,7 +169,87 @@
         <option value="Rainy">Rainy</option>
       </select>
 
-      <button type="submit">Get Fishing Recommendations</button>
+<!-- SEASON -->
+<label for="season">Season</label>
+<select id="season">
+  <option value="">Select season</option>
+  <option value="Spring">Spring</option>
+  <option value="Summer">Summer</option>
+  <option value="Fall">Fall</option>
+  <option value="Winter">Winter</option>
+</select>
+
+<!-- TIME OF DAY -->
+<label for="time">Time of day</label>
+<select id="time">
+  <option value="">Select time</option>
+  <option value="Early morning">Early morning</option>
+  <option value="Morning">Morning</option>
+  <option value="Midday">Midday</option>
+  <option value="Afternoon">Afternoon</option>
+  <option value="Evening">Evening</option>
+  <option value="Night">Night</option>
+</select>
+
+<!-- WIND SPEED -->
+<label for="wind">Wind speed (mph)</label>
+<input
+  type="number"
+  id="wind"
+  min="0"
+  max="100"
+  placeholder="Example: 8"
+>
+
+<!-- WIND DIRECTION -->
+<label for="windDirection">Wind direction</label>
+<select id="windDirection">
+  <option value="">Select direction</option>
+  <option value="North">North</option>
+  <option value="Northeast">Northeast</option>
+  <option value="East">East</option>
+  <option value="Southeast">Southeast</option>
+  <option value="South">South</option>
+  <option value="Southwest">Southwest</option>
+  <option value="West">West</option>
+  <option value="Northwest">Northwest</option>
+  <option value="Variable">Variable</option>
+</select>
+
+<!-- STRUCTURE AND COVER -->
+<label for="structure">What type of cover are you fishing?</label>
+<select id="structure">
+  <option value="">Not sure / Unknown</option>
+  <option value="Grass">Grass or vegetation</option>
+  <option value="Wood">Trees, logs, or brush</option>
+  <option value="Rocks">Rocks or boulders</option>
+  <option value="Docks">Docks or boat structures</option>
+  <option value="Open water">Open water</option>
+  <option value="Mixed">Multiple types</option>
+</select>
+
+<!-- WATER DEPTH -->
+<label for="depth">Water depth</label>
+<select id="depth">
+  <option value="">Not sure</option>
+  <option value="Shallow">Shallow (0–5 feet)</option>
+  <option value="Medium">Medium (5–15 feet)</option>
+  <option value="Deep">Deep (15+ feet)</option>
+</select>
+
+<!-- BAITFISH -->
+<label for="forage">What do you think the bass are feeding on?</label>
+<select id="forage">
+  <option value="">Not sure</option>
+  <option value="Shad">Shad</option>
+  <option value="Bluegill">Bluegill</option>
+  <option value="Crawfish">Crawfish</option>
+  <option value="Other">Other small prey</option>
+</select>
+
+<button type="submit">Get Fishing Recommendations</button>
+
+   
 
     </form>
 
