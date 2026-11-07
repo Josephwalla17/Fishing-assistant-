@@ -727,5 +727,13 @@ form.addEventListener("submit", function(event) {
 });
 </script>
 <script src="LureDatabase.js"></script>
+  <script>
+  document.body.insertAdjacentHTML(
+    "beforeend",
+    "<p style='padding:10px;background:#d1fae5;color:#065f46;'>Database loaded: " +
+    (window.lureDatabase ? window.lureDatabase.length : 0) +
+    " techniques</p>"
+  );
+</script>
 </body>
 </html>
